@@ -1,0 +1,19 @@
+$general-font: 'Orbitron', sans-serif;
+$weight-regular: 400;
+$weight-bold: 700;
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''),
+  url('../fonts/orbitron-400.woff2') format('woff2')
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''),
+  url('../fonts/orbitron-700.woff2') format('woff2')
+}

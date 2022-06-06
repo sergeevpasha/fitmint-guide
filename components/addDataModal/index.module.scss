@@ -1,0 +1,21 @@
+.addDataModal {
+  color: #fff !important;
+
+  h2 {
+    font-size: 1.2em;
+    padding: 0 0.8rem;
+  }
+
+  h4 {
+    font-size: 0.8em;
+    margin-bottom: 1.4em;
+    padding: 0 0.8rem;
+  }
+
+  .actionsModal {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 1rem 0.8rem 0;
+  }
+}

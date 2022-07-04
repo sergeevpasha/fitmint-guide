@@ -42,10 +42,8 @@ web3.eth
     })
     .on('data', async ({ data }) => {
         const decoded = web3.eth.abi.decodeParameters(['address', 'string'], data);
-        const address = decoded['0'];
         const activity: ActivityRequest = JSON.parse(Base64.decode(decoded['1']));
         await ActivityService.create(activity);
-        await UserService.increaseAttempts(address, 10);
     });
 
 web3.eth

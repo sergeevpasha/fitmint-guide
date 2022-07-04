@@ -26,7 +26,7 @@ export default function AddressButton(): ReactElement {
     };
 
     const syncAttempts = async (wallet: string): Promise<void> => {
-        axios.get(`/api/users/${wallet}`).then(({ data: { data } }: { data: { data: UserModel } }) => {
+        axios.get(`users/${wallet}`).then(({ data: { data } }: { data: { data: UserModel } }) => {
             dispatch({ type: 'user/setAttempts', payload: data ? data.attempts : 0 });
         });
     };

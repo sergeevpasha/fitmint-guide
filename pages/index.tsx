@@ -18,7 +18,7 @@ import AddDataModal from '../components/addDataModal';
 import { ActivityType } from '../app/models/Activity';
 
 export async function getServerSideProps() {
-    const { data } = await axios.get('/api/calculator');
+    const { data } = await axios.get('calculator');
     return {
         props: {
             calculator: data.data,
@@ -62,7 +62,7 @@ function Home({ calculator }: HomeProps): ReactElement {
 
     const unlockCalculator = async () => {
         if (attempts > 0) {
-            await axios.patch(`/api/users/${address}`).then(({ data: { data } }: { data: { data: UserModel } }) => {
+            await axios.patch(`users/${address}`).then(({ data: { data } }: { data: { data: UserModel } }) => {
                 dispatch({ type: 'user/setAttempts', payload: data ? data.attempts : 0 });
             });
             setUnlocked(true);

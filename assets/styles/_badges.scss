@@ -1,0 +1,68 @@
+.badge {
+  display: inline-block;
+  border-radius: .75em;
+
+  div {
+    display: inline-block;
+    float: left;
+    color: #fff;
+    text-shadow: 0 .1em 0 rgba(0, 0, 0, .5);
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    &:first-child {
+      border-top-left-radius: .25em;
+      border-bottom-left-radius: .25em;
+
+      span {
+        border-top-left-radius: .25em;
+        border-bottom-left-radius: .25em;
+      }
+    }
+
+    &:last-child {
+      border-top-right-radius: .25em;
+      border-bottom-right-radius: .25em;
+
+      span {
+        border-top-right-radius: .25em;
+        border-bottom-right-radius: .25em;
+      }
+    }
+
+    span {
+      display: inline-block;
+      font-size: .8em;
+      background: linear-gradient(180deg, rgba(187, 187, 187, .1) 0%, rgba(0, 0, 0, .1) 100%);
+      padding: .25em .5em;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.badge {
+  .name {
+    background: #555555;
+  }
+
+  .status.green {
+    background: #44cc11;
+  }
+
+  .status.yellow {
+    background: #ddcc00;
+  }
+
+  .status.blue {
+    background: #00aadd;
+  }
+
+  .status.red {
+    background: #cc1100;
+  }
+
+  .status.gray {
+    background: #cccccc;
+  }
+}

@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 
-export default function calculatorHeader(): ReactElement {
+export default function CalculatorHeader(): ReactElement {
     return (
         <div className="header-name">
             <svg width="592" height="129" viewBox="0 0 592 129" fill="none" xmlns="http://www.w3.org/2000/svg">

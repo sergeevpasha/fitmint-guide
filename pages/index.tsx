@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { withTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { Button } from 'react-bootstrap';
+import { Button, FormSelect } from 'react-bootstrap';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import axios from '../axios.config';
-import CalculatorHeader from '../components/calculatorHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import { ScriptProps } from 'next/script';
+import axios from 'axios';
 import CounterInput from '../components/counter';
 import NumberInput from '../components/numberInput';
+import HowToUse from '../components/howToUse';
+import FitmintGuideTokenSvg from '../components/svg/fitmintGuideTokenSvg';
+import AddTopUpModal from '../components/topUpModal';
+import { UserModel } from '../app/models/User';
+import UnlockSvg from '../components/svg/unlockSvg';
+import AddDataModal from '../components/addDataModal';
+import { ActivityType } from '../app/models/Activity';
 
 export async function getServerSideProps() {
-    const { data } = await axios.get('calculator');
+    const { data } = await axios.get('/api/calculator');
     return {
         props: {
             calculator: data.data,
@@ -18,13 +27,18 @@ export async function getServerSideProps() {
     };
 }
 
-function Home(props: any) {
-    const { calculator } = props;
+interface HomeProps extends ScriptProps {
+    calculator: any;
+}
+
+function Home({ calculator }: HomeProps): ReactElement {
+    const dispatch = useDispatch();
     const defaultActivity = {
         daily_profit: 0,
         daily_earnings: 0,
         daily_expending: 0,
         daily_health: 0,
+        type: ActivityType.WALK,
         sneaker_level: 2,
         energy_available: 15,
         basic_power: '',
@@ -37,70 +51,100 @@ function Home(props: any) {
         comfort: ''
     };
 
+    const address = useSelector((state: any) => state.user.address);
+    const attempts = useSelector((state: any) => state.user.attempts);
+    const isLoggedIn = useSelector((state: any) => state.user.isLoggedIn);
+    const [modalShow, setModalShow] = useState(false);
     const [activity, setActivity] = useState(defaultActivity);
+    const [unlocked, setUnlocked] = useState(false);
+    const [addActivityModalShow, setAddActivityModalShow] = useState(false);
+    const [availablePointsToSpend, setAvailablePointsToSpend] = useState(+activity.sneaker_level * 4);
 
-    const setObjectActivity = (value: any) => {
-        const newActivity = { ...activity, ...value };
-        const repairCost: number =
-            calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)?.repair_cost ||
-            0;
-
-        const durability: number = +activity.basic_durability + +activity.durability || 0;
-        const power: number = +activity.basic_power + +activity.power || 0;
-        const earnings: number = +calculator.avg_profit_per_power * power * +activity.energy_available;
-        const dailyHealth: number = +activity.energy_available / (1 + durability / 10);
-        const expending: number = repairCost * dailyHealth;
-        const profit: number = earnings > expending ? earnings - expending : 0;
-        setActivity({
-            ...newActivity,
-            ...{
-                daily_profit: profit.toFixed(2),
-                daily_earnings: earnings.toFixed(2),
-                daily_expending: expending.toFixed(2),
-                daily_health: dailyHealth.toFixed(2)
-            }
-        });
-    };
-    const optimizePoints = () => {
-        const pointsToSpend: number = +activity.sneaker_level * 4;
-        let possiblePower: number = +activity.basic_power || 0;
-        let possibleDurability: number = +activity.basic_durability || 0;
-        const repairCost: number =
-            calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)?.repair_cost ||
-            0;
-
-        for (let i = 0; i < pointsToSpend; i += 1) {
-            const cf = 1 + possibleDurability / 10;
-            const possibleCf = 1 + (possibleDurability + 1) / 10;
-
-            const drb =
-                (possiblePower + 1) * +calculator.avg_profit_per_power * +activity.energy_available -
-                repairCost * (+activity.energy_available / cf);
-            const pwr =
-                possiblePower * +calculator.avg_profit_per_power * +activity.energy_available -
-                repairCost * (+activity.energy_available / possibleCf);
-            if (drb > pwr) {
-                possiblePower += 1;
-            } else {
-                possibleDurability += 1;
-            }
+    const unlockCalculator = async () => {
+        if (attempts > 0) {
+            await axios.patch(`/api/users/${address}`).then(({ data: { data } }: { data: { data: UserModel } }) => {
+                dispatch({ type: 'user/setAttempts', payload: data ? data.attempts : 0 });
+            });
+            setUnlocked(true);
+            setTimeout(() => {
+                setUnlocked(false);
+            }, 600000);
+        } else {
+            toast('Insufficient app balance');
         }
+    };
+    const setObjectActivity = (value: any) => {
+        if (unlocked) {
+            const assignedPoints: number =
+                +activity.durability -
+                +activity.basic_durability +
+                +activity.stamina -
+                +activity.basic_stamina +
+                +activity.comfort -
+                +activity.basic_comfort +
+                +activity.power -
+                +activity.basic_power;
+            const pointsToSpend: number = +activity.sneaker_level * 4 - assignedPoints;
+            setAvailablePointsToSpend(pointsToSpend);
+            const avgProfit =
+                +calculator.avg_profit_per_power_type_modifier[
+                    value.type?.toLowerCase() || activity.type.toLowerCase()
+                ];
+            const newActivity = { ...activity, ...value };
+            const repairCost: number =
+                calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)
+                    ?.repair_cost || 0;
+            const durability: number = +activity.durability || 0;
+            const power: number = +activity.power || 0;
+            const earnings: number = avgProfit * power * +activity.energy_available;
+            const dailyHealth: number = +activity.energy_available / (1 + durability / 10);
+            const expending: number = repairCost * dailyHealth;
+            const profit: number = earnings > expending ? earnings - expending : 0;
+            setActivity({
+                ...newActivity,
+                ...{
+                    daily_profit: profit.toFixed(2),
+                    daily_earnings: earnings.toFixed(2),
+                    daily_expending: expending.toFixed(2),
+                    daily_health: dailyHealth.toFixed(2)
+                }
+            });
+        }
+    };
+    const optimizePoints = async () => {
+        if (unlocked) {
+            const avgProfit = +calculator.avg_profit_per_power_type_modifier[activity.type.toLowerCase()];
+            const pointsToSpend: number = +activity.sneaker_level * 4;
+            let possiblePower: number = +activity.basic_power || 0;
+            let possibleDurability: number = +activity.basic_durability || 0;
+            const repairCost: number =
+                calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)
+                    ?.repair_cost || 0;
 
-        const earnings = calculator.avg_profit_per_power * possiblePower * +activity.energy_available;
-        const dailyHealth = +activity.energy_available / (possibleDurability + possibleDurability / 10);
-        const expending = repairCost * dailyHealth;
-        const profit: number = earnings > expending ? earnings - expending : 0;
+            for (let i = 0; i < pointsToSpend; i += 1) {
+                const cf = 1 + possibleDurability / 10;
+                const possibleCf = 1 + (possibleDurability + 1) / 10;
 
-        setObjectActivity({
-            daily_profit: profit.toFixed(2),
-            daily_earnings: earnings.toFixed(2),
-            daily_expending: expending.toFixed(2),
-            daily_health: dailyHealth.toFixed(2),
-            power: possiblePower,
-            durability: possibleDurability,
-            stamina: 0,
-            comfort: 0
-        });
+                const drb =
+                    (possiblePower + 1) * avgProfit * +activity.energy_available -
+                    repairCost * (+activity.energy_available / cf);
+                const pwr =
+                    possiblePower * avgProfit * +activity.energy_available -
+                    repairCost * (+activity.energy_available / possibleCf);
+                if (drb > pwr) {
+                    possiblePower += 1;
+                } else {
+                    possibleDurability += 1;
+                }
+            }
+
+            setObjectActivity({
+                power: possiblePower,
+                durability: possibleDurability,
+                stamina: activity.basic_stamina,
+                comfort: activity.basic_comfort
+            });
+        }
     };
 
     const resetPoints = () => {
@@ -122,10 +166,58 @@ function Home(props: any) {
         <div className="container">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="rotate" src="/images/sphere.png" alt="" />
-            <CalculatorHeader />
-            <div className="row-main">
+            <HowToUse />
+            <div className="access-block">
+                <div className="token-balance">
+                    <span>App balance: </span>
+                    <span>{attempts}</span>
+                    <FitmintGuideTokenSvg />
+                    <span className="mr-2">FGT</span>
+                    <Button variant="secondary" size="sm" onClick={() => setModalShow(true)}>
+                        Top Up
+                    </Button>
+                    <Button
+                        variant={`${isLoggedIn ? 'warning' : 'secondary'}`}
+                        size="sm"
+                        onClick={() => setAddActivityModalShow(true)}
+                        disabled={!isLoggedIn}
+                    >
+                        Post run results
+                    </Button>
+                </div>
+                {unlocked ? (
+                    ''
+                ) : (
+                    <Button
+                        className="primary d-flex align-items-center p-2 mt-3"
+                        size="sm"
+                        onClick={() => unlockCalculator()}
+                    >
+                        <UnlockSvg width={20} height={20} />
+                        <span className="ml-1">Unlock with 1 FGT</span>
+                    </Button>
+                )}
+            </div>
+            {/* <CalculatorHeader /> */}
+            <div className="row-main" style={!unlocked ? { pointerEvents: 'none', opacity: '0.1' } : {}}>
                 <div className="col-main">
                     <h3>Sneaker</h3>
+                    <div className="attribute-row">
+                        <div className="attribute-col">
+                            <span>Activity Type</span>
+                        </div>
+                        <div className="attribute-col">
+                            <FormSelect
+                                defaultValue="WALK"
+                                onChange={event => setObjectActivity({ type: event.target.value })}
+                                aria-label="Default select example"
+                            >
+                                <option value="WALK">WALK</option>
+                                <option value="JOG">JOG</option>
+                                <option value="RUN">RUN</option>
+                            </FormSelect>
+                        </div>
+                    </div>
                     <div className="attribute-row">
                         <div className="attribute-col">
                             <span>Level</span>
@@ -133,6 +225,7 @@ function Home(props: any) {
                         <div className="attribute-col">
                             <CounterInput
                                 value={activity.sneaker_level}
+                                max={50}
                                 setActivity={(value: number) => setObjectActivity({ sneaker_level: value })}
                             />
                         </div>
@@ -144,6 +237,7 @@ function Home(props: any) {
                         <div className="attribute-col">
                             <CounterInput
                                 value={activity.energy_available}
+                                max={15}
                                 setActivity={(value: number) => setObjectActivity({ energy_available: value })}
                             />
                         </div>
@@ -157,7 +251,7 @@ function Home(props: any) {
                     </div>
                 </div>
             </div>
-            <div className="row-main">
+            <div className="row-main" style={!unlocked ? { pointerEvents: 'none', opacity: '0.1' } : {}}>
                 <div className="col-main">
                     <h3>Attributes</h3>
                     <div className="attribute-row">
@@ -172,12 +266,14 @@ function Home(props: any) {
                         <div className="attribute-col-3">
                             <NumberInput
                                 value={activity.basic_power}
+                                max={10}
                                 setActivity={(value: number) => setObjectActivity({ basic_power: value })}
                             />
                         </div>
                         <div className="attribute-col-3">
                             <CounterInput
                                 value={activity.power}
+                                max={activity.power + availablePointsToSpend}
                                 setActivity={(value: number) => setObjectActivity({ power: value })}
                             />
                         </div>
@@ -189,12 +285,14 @@ function Home(props: any) {
                         <div className="attribute-col-3">
                             <NumberInput
                                 value={activity.basic_durability}
+                                max={10}
                                 setActivity={(value: number) => setObjectActivity({ basic_durability: value })}
                             />
                         </div>
                         <div className="attribute-col-3">
                             <CounterInput
                                 value={activity.durability}
+                                max={activity.durability + availablePointsToSpend}
                                 setActivity={(value: number) => setObjectActivity({ durability: value })}
                             />
                         </div>
@@ -206,12 +304,14 @@ function Home(props: any) {
                         <div className="attribute-col-3">
                             <NumberInput
                                 value={activity.basic_stamina}
+                                max={10}
                                 setActivity={(value: number) => setObjectActivity({ basic_stamina: value })}
                             />
                         </div>
                         <div className="attribute-col-3">
                             <CounterInput
                                 value={activity.stamina}
+                                max={activity.stamina + availablePointsToSpend}
                                 setActivity={(value: number) => setObjectActivity({ stamina: value })}
                             />
                         </div>
@@ -223,18 +323,20 @@ function Home(props: any) {
                         <div className="attribute-col-3">
                             <NumberInput
                                 value={activity.basic_comfort}
+                                max={10}
                                 setActivity={(value: number) => setObjectActivity({ basic_comfort: value })}
                             />
                         </div>
                         <div className="attribute-col-3">
                             <CounterInput
                                 value={activity.comfort}
+                                max={activity.comfort + availablePointsToSpend}
                                 setActivity={(value: number) => setObjectActivity({ comfort: value })}
                             />
                         </div>
                     </div>
                     <div className="attribute-row mt-2">
-                        <div className="attribute-col-3">Points: 36</div>
+                        <div className="attribute-col-3">Points: {availablePointsToSpend}</div>
                         <div className="attribute-col-3">
                             <Button className="primary reset-btn" onClick={resetPoints}>
                                 Reset
@@ -296,6 +398,8 @@ function Home(props: any) {
                     </div>
                 </div>
             </div>
+            <AddTopUpModal show={modalShow} onHide={() => setModalShow(false)} />
+            <AddDataModal show={addActivityModalShow} onHide={() => setAddActivityModalShow(false)} />
         </div>
     );
 }

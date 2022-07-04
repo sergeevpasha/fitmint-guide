@@ -1,13 +1,20 @@
-import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Container, FormSelect, Modal, Row, Spinner } from 'react-bootstrap';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { Base64 } from 'js-base64';
+import { useSelector } from 'react-redux';
 import styles from './index.module.scss';
 import CounterInput from '../counter';
+import { postResults } from '../../utils/contracts/fitmintGuideActivities';
+import AddTokenButton from '../addTokenButton';
 
 export default function AddDataModal(props: any): JSX.Element {
+    const address = useSelector((state: any) => state.user.address);
+    const balance = useSelector((state: any) => state.user.balance);
     const { onHide } = props;
     const defaultActivity = {
+        type: 'WALK',
         sneaker_level: '',
         next_level: '',
         health_spent: '',
@@ -17,28 +24,40 @@ export default function AddDataModal(props: any): JSX.Element {
         power: '',
         durability: '',
         stamina: '',
-        comfort: ''
+        comfort: '',
+        version: 1
     };
     const [activity, setActivity] = useState(defaultActivity);
+    const [awaitingTransaction, setAwaitingTransaction] = useState(false);
 
     const setObjectActivity = (value: any) => {
         const newActivity = { ...activity, ...value };
         setActivity(newActivity);
     };
 
+    const pending = (value: boolean, message?: string): void => {
+        setAwaitingTransaction(value);
+        if (!value && !awaitingTransaction && message) {
+            toast(message);
+            setActivity(defaultActivity);
+            onHide();
+        }
+    };
+
     const sendResults = async () => {
-        await axios
-            .post('/api/activities', {
-                ...activity
-            })
-            .then(() => {
-                toast('Results uploaded successfully.');
-                setActivity(defaultActivity);
-                onHide();
-            })
-            .catch(() => {
-                toast('Please fill in all of the fields...');
-            });
+        if (address) {
+            await axios
+                .post('/activities', {
+                    ...activity
+                })
+                .then(async () => {
+                    const results = Base64.encode(JSON.stringify(activity));
+                    await postResults(address, results, pending);
+                })
+                .catch(() => {
+                    toast('Please fill in all of the fields...');
+                });
+        }
     };
 
     return (
@@ -47,6 +66,24 @@ export default function AddDataModal(props: any): JSX.Element {
                 <h2>Share your run results</h2>
                 <h4>Fill in your sneaker’s attributes and actual run results</h4>
                 <Container>
+                    <Row>
+                        <Col className="my-2" xs={12} md={6}>
+                            <Row>
+                                <Col>Type</Col>
+                                <Col className="d-flex justify-end">
+                                    <FormSelect
+                                        defaultValue="WALK"
+                                        onChange={event => setObjectActivity({ type: event.target.value })}
+                                        aria-label="Default select example"
+                                    >
+                                        <option value="WALK">WALK</option>
+                                        <option value="JOG">JOG</option>
+                                        <option value="RUN">RUN</option>
+                                    </FormSelect>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
                     <Row>
                         <Col className="my-2" xs={12} md={6}>
                             <Row>
@@ -171,9 +208,24 @@ export default function AddDataModal(props: any): JSX.Element {
                     </Row>
                 </Container>
                 <div className={styles.actionsModal}>
-                    <Button className="primary" onClick={sendResults}>
-                        Submit
-                    </Button>
+                    {balance <= 0 ? <AddTokenButton /> : ''}
+                    {awaitingTransaction ? (
+                        <Button className="primary ml-1" disabled>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                            <span>Awaiting transaction...</span>
+                        </Button>
+                    ) : (
+                        <Button className="primary ml-1" onClick={sendResults}>
+                            Submit
+                        </Button>
+                    )}
                 </div>
             </Modal.Body>
         </Modal>

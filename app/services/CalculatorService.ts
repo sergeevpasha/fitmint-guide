@@ -1,28 +1,45 @@
-import { Activity, ActivityModel } from '../models/Activity';
+import { Activity, ActivityModel, ActivityType } from '../models/Activity';
 
 class CalculatorService {
-    public static async avgProfitPerPower(): Promise<number | null> {
-        const avgProfitPerPower: ActivityModel[] = await Activity.aggregate([
-            { $group: { _id: null, profit_per_power: { $avg: '$profit_per_power' } } }
+    public static async avgRepairCostPerEnergy(): Promise<number | null> {
+        const avgRepairCostPerEnergy: ActivityModel[] = await Activity.aggregate([
+            { $group: { _id: null, repair_cost_per_energy: { $avg: '$repair_cost_per_energy' } } }
         ]);
 
-        return avgProfitPerPower[0]?.profit_per_power || null;
+        return avgRepairCostPerEnergy[0]?.repair_cost_per_energy || null;
     }
 
-    public static async avgEnergyEarningCoefficient(): Promise<number | null> {
-        const avgEnergyEarningCoefficient: ActivityModel[] = await Activity.aggregate([
-            { $group: { _id: null, energy_earning_coefficient: { $avg: '$energy_earning_coefficient' } } }
+    public static async avgProfitPerPowerTypeModifiers(): Promise<{
+        walk: number | null;
+        jog: number | null;
+        run: number | null;
+    }> {
+        const walkTypes: ActivityModel[] = await Activity.aggregate([
+            { $match: { type: ActivityType.WALK } },
+            {
+                $group: { _id: null, profit_per_power: { $avg: '$profit_per_power' } }
+            }
         ]);
 
-        return avgEnergyEarningCoefficient[0]?.energy_earning_coefficient || null;
-    }
-
-    public static async avgDurabilitySpending(): Promise<number | null> {
-        const avgDurabilitySpending: ActivityModel[] = await Activity.aggregate([
-            { $group: { _id: null, durability_spending: { $avg: '$durability_spending' } } }
+        const jogTypes: ActivityModel[] = await Activity.aggregate([
+            { $match: { type: ActivityType.JOG } },
+            {
+                $group: { _id: null, profit_per_power: { $avg: '$profit_per_power' } }
+            }
         ]);
 
-        return avgDurabilitySpending[0]?.durability_spending || null;
+        const runTypes: ActivityModel[] = await Activity.aggregate([
+            { $match: { type: ActivityType.RUN } },
+            {
+                $group: { _id: null, profit_per_power: { $avg: '$profit_per_power' } }
+            }
+        ]);
+
+        return {
+            walk: walkTypes[0]?.profit_per_power || null,
+            jog: jogTypes[0]?.profit_per_power || null,
+            run: runTypes[0]?.profit_per_power || null
+        };
     }
 
     public static async repairToSneakerLevelList(): Promise<object[] | null> {

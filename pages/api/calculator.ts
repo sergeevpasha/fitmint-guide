@@ -3,15 +3,13 @@ import dbConnect from '../../mongoose';
 import CalculatorService from '../../app/services/CalculatorService';
 
 async function getAverageData(response: NextApiResponse): Promise<void> {
-    const avgProfitPerPower: number | null = await CalculatorService.avgProfitPerPower();
-    const avgEnergyEarningCoefficient: number | null = await CalculatorService.avgEnergyEarningCoefficient();
+    const avpProfitPerPowerTypeModifiers: any = await CalculatorService.avgProfitPerPowerTypeModifiers();
     const repairToSneakerLevelList: object[] | null = await CalculatorService.repairToSneakerLevelList();
 
     response.status(200).json({
         success: true,
         data: {
-            avg_profit_per_power: avgProfitPerPower,
-            avg_energy_earning_coefficient: avgEnergyEarningCoefficient,
+            avg_profit_per_power_type_modifier: avpProfitPerPowerTypeModifiers,
             repair_list: repairToSneakerLevelList
         }
     });

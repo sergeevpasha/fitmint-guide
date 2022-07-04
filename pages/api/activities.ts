@@ -1,10 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../mongoose';
 import ActivityService from '../../app/services/ActivityService';
-import { ActivityModel } from '../../app/models/Activity';
+import { ActivityModel, ActivityType } from '../../app/models/Activity';
 
 function validateRequest(request: any, response: NextApiResponse): boolean {
     const errors: unknown[] = [];
+
+    if (!request.type) {
+        errors.push('Sneaker type is not set');
+    } else if (![ActivityType.WALK, ActivityType.JOG, ActivityType.RUN].includes(request.type)) {
+        errors.push('Sneaker type must be one of the following: WALK, JOG, RUN');
+    }
 
     if (!request.sneaker_level) {
         errors.push('Sneaker level is not set');
@@ -74,12 +80,12 @@ function validateRequest(request: any, response: NextApiResponse): boolean {
     return true;
 }
 
-async function createActivity(request: { [p: string]: string | string[] }, response: NextApiResponse): Promise<void> {
-    const activity: ActivityModel = await ActivityService.create(request);
-    response.status(201).json({ success: true, data: activity });
-}
-
-async function showActivities(request: { [p: string]: string | string[] }, response: NextApiResponse): Promise<void> {
+async function showActivities(
+    request: Partial<{
+        [key: string]: string | string[];
+    }>,
+    response: NextApiResponse
+): Promise<void> {
     const activities: ActivityModel[] | null = await ActivityService.query(request);
     response.status(200).json({ success: true, data: activities });
 }
@@ -95,7 +101,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
             break;
         case 'POST':
             if (validateRequest(request.body, response)) {
-                await createActivity(request.body, response);
+                response.status(200).json({ success: true });
             }
             break;
         default:

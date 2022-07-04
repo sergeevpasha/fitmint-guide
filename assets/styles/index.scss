@@ -1,4 +1,5 @@
 @import 'fonts';
+@import 'badges';
 @import "~bootstrap/scss/bootstrap";
 
 * {
@@ -116,6 +117,7 @@ main {
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-top: 1em;
     color: #fff;
     @media (min-width: 920px) {
       width: 50%;
@@ -214,28 +216,42 @@ h3 {
   margin-right: 0.4em;
 }
 
+.mr-2 {
+  margin-right: 0.4em;
+}
+
+.mr-4 {
+  margin-right: 0.8em;
+}
+
 .optimize-btn {
-  width: 8.4em;
+  font-size: 0.7em;
+  width: 8.4rem;
+  @media (min-width: 1800px) {
+    font-size: 0.85em;
+    width: 10.2em;
+  }
 }
 
 .reset-btn {
-  width: 4.4em;
+  font-size: 0.7em;
+  width: 4rem;
   background: transparent !important;
+  @media (min-width: 1800px) {
+    font-size: 0.85em;
+    width: 5em;
+  }
 }
 
 button {
   border-radius: 40px !important;
 
   &.primary {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1em;
-    height: 2em;
     background-color: #168ECB;
     border-color: #168ECB;
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &:disabled {
+      opacity: 1;
       background-color: #227BB7 !important;
       border-color: #227BB7 !important;
     }
@@ -280,4 +296,26 @@ button {
   @media (min-width: 3200px) {
     max-width: 1800px;
   }
+}
+
+.token-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #fff;
+
+  svg {
+    height: 1.2em;
+    width: 1.2em;
+  }
+}
+
+.access-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
 }

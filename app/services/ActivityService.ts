@@ -10,8 +10,9 @@ class ActivityService {
         return Activity.findById(id).catch(() => null);
     }
 
-    public static async create(createActivity: any): Promise<ActivityModel> {
+    public static async create(createActivity: any): Promise<any> {
         return Activity.create({
+            type: createActivity.type,
             calories: createActivity.calories,
             earnings: createActivity.earnings,
             health_spent: createActivity.health_spent,
@@ -22,7 +23,8 @@ class ActivityService {
             power: createActivity.power,
             durability: createActivity.durability,
             stamina: createActivity.stamina,
-            comfort: createActivity.comfort
+            comfort: createActivity.comfort,
+            version: createActivity.version
         });
     }
 }

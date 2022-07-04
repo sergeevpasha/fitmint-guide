@@ -1,9 +1,9 @@
 import { Button, Col, Container, FormSelect, Modal, Row, Spinner } from 'react-bootstrap';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Base64 } from 'js-base64';
 import { useSelector } from 'react-redux';
+import axios from '../../axios.config';
 import styles from './index.module.scss';
 import CounterInput from '../counter';
 import { postResults } from '../../utils/contracts/fitmintGuideActivities';

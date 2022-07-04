@@ -6,7 +6,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { ScriptProps } from 'next/script';
-import axios from 'axios';
+import axios from '../axios.config';
 import CounterInput from '../components/counter';
 import NumberInput from '../components/numberInput';
 import HowToUse from '../components/howToUse';

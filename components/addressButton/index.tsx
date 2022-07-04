@@ -2,11 +2,11 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createAlchemyWeb3 } from '@alch/alchemy-web3';
-import axios from 'axios';
 import { getChainId, getUserChainId, switchToDefaultNetwork } from '../../utils/contracts/web3connector';
 import { connectWallet, getCurrentWalletConnected } from '../../utils/contracts/fitmintGuideActivities';
 import cutStringInTheMiddle from '../../utils/cutStringInTheMiddle';
 import { getBalance } from '../../utils/contracts/fitmintGuideToken';
+import axios from '../../axios.config';
 import { UserModel } from '../../app/models/User';
 
 const rpcWsUrl = process.env.NEXT_PUBLIC_ACLHEMY_API_WS_URL || '';

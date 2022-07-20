@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
 import { Col, Container, Row } from 'react-bootstrap';
 import { store } from '../store';
 import Header from '../components/header';
-import AddTokenButton from '../components/addTokenButton';
 
 function Layout({ children }: { children: ReactElement }) {
     return (

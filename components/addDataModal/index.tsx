@@ -7,11 +7,9 @@ import axios from '../../axios.config';
 import styles from './index.module.scss';
 import CounterInput from '../counter';
 import { postResults } from '../../utils/contracts/fitmintGuideActivities';
-import AddTokenButton from '../addTokenButton';
 
 export default function AddDataModal(props: any): JSX.Element {
     const address = useSelector((state: any) => state.user.address);
-    const balance = useSelector((state: any) => state.user.balance);
     const { onHide } = props;
     const defaultActivity = {
         type: 'WALK',

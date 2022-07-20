@@ -12,7 +12,7 @@ config({ path: '.env.local' });
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
-const port = process.env.APP_PORT ? +process.env.APP_PORT : 3000;
+const port = process.env.NEXT_PUBLIC_APP_PORT ? +process.env.NEXT_PUBLIC_APP_PORT : 3000;
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();

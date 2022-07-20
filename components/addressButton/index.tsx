@@ -56,7 +56,6 @@ export default function AddressButton(): ReactElement {
                 dispatch({ type: 'user/setBalance', payload: tokenBalance });
                 if ((await getUserChainId()) !== (await getChainId())) {
                     setIsWrongNetwork(true);
-                    await switchNetwork();
                 }
             }
         };

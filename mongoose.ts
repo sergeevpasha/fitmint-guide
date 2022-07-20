@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 
 declare let global: any;
 

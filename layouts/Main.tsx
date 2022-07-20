@@ -4,8 +4,10 @@ import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
 import Script from 'next/script';
 import { Provider } from 'react-redux';
+import { Col, Container, Row } from 'react-bootstrap';
 import { store } from '../store';
 import Header from '../components/header';
+import AddTokenButton from '../components/addTokenButton';
 
 function Layout({ children }: { children: ReactElement }) {
     return (
@@ -21,22 +23,66 @@ function Layout({ children }: { children: ReactElement }) {
                 <Toaster />
             </Provider>
             <footer>
-                <div className="py-4">
-                    <div className="container text-center">
-                        <a
-                            href="https://github.com/sergeevpasha/trion"
-                            className="badge pl-2"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <div className="name">
-                                <span>Build</span>
-                            </div>
-                            <div className="status blue">
-                                <span>v0.1.0</span>
-                            </div>
-                        </a>
-                    </div>
+                <Container>
+                    <Row className="justify-content-center">
+                        <Col xs={12} md={6}>
+                            <ul>
+                                <li>
+                                    <a
+                                        href="https://polygonscan.com/address/0x03164146EDBCaf351FCF0C316AF6CB0412b54233"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        Fitmint Guide Contract Address - 0x03164146EDBCaf351FCF0C316AF6CB0412b54233
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://polygonscan.com/token/0x7aB2eEE22bC8C49D96a3746028A5F54B49C73Cba"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        Fitmint Guide Token Address - 0x7aB2eEE22bC8C49D96a3746028A5F54B49C73Cba
+                                    </a>
+                                </li>
+                            </ul>
+                        </Col>
+                        <Col xs={12} md={6}>
+                            <ul>
+                                <li>
+                                    <a href="https://sergeevpasha.unxhub.online/" target="_blank" rel="noreferrer">
+                                        Contact me
+                                    </a>
+                                </li>
+                                <li>
+                                    Help the project by submitting a Pull Request at
+                                    <a
+                                        href="https://github.com/sergeevpasha/fitmint-guide"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="ml-1"
+                                    >
+                                        GitHub
+                                    </a>
+                                </li>
+                            </ul>
+                        </Col>
+                    </Row>
+                </Container>
+                <div className="container text-center">
+                    <a
+                        href="https://github.com/sergeevpasha/fitmint-guide"
+                        className="badge pl-2"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <div className="name">
+                            <span>Build</span>
+                        </div>
+                        <div className="status blue">
+                            <span>v0.1.1</span>
+                        </div>
+                    </a>
                 </div>
             </footer>
             <Script src="https://www.googletagmanager.com/gtag/js?id=G-TLM2DQ1DXQ" strategy="afterInteractive" />

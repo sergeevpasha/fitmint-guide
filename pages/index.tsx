@@ -13,9 +13,9 @@ import HowToUse from '../components/howToUse';
 import FitmintGuideTokenSvg from '../components/svg/fitmintGuideTokenSvg';
 import AddTopUpModal from '../components/topUpModal';
 import { UserModel } from '../app/models/User';
-import UnlockSvg from '../components/svg/unlockSvg';
 import AddDataModal from '../components/addDataModal';
 import { ActivityType } from '../app/models/Activity';
+import AddTokenButton from '../components/addTokenButton';
 
 export async function getServerSideProps() {
     const { data } = await axios.get('calculator');
@@ -74,42 +74,38 @@ function Home({ calculator }: HomeProps): ReactElement {
         }
     };
     const setObjectActivity = (value: any) => {
-        if (unlocked) {
-            const assignedPoints: number =
-                +activity.durability -
-                +activity.basic_durability +
-                +activity.stamina -
-                +activity.basic_stamina +
-                +activity.comfort -
-                +activity.basic_comfort +
-                +activity.power -
-                +activity.basic_power;
-            const pointsToSpend: number = +activity.sneaker_level * 4 - assignedPoints;
-            setAvailablePointsToSpend(pointsToSpend);
-            const avgProfit =
-                +calculator.avg_profit_per_power_type_modifier[
-                    value.type?.toLowerCase() || activity.type.toLowerCase()
-                ];
-            const newActivity = { ...activity, ...value };
-            const repairCost: number =
-                calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)
-                    ?.repair_cost || 0;
-            const durability: number = +activity.durability || 0;
-            const power: number = +activity.power || 0;
-            const earnings: number = avgProfit * power * +activity.energy_available;
-            const dailyHealth: number = +activity.energy_available / (1 + durability / 10);
-            const expending: number = repairCost * dailyHealth;
-            const profit: number = earnings > expending ? earnings - expending : 0;
-            setActivity({
-                ...newActivity,
-                ...{
-                    daily_profit: profit.toFixed(2),
-                    daily_earnings: earnings.toFixed(2),
-                    daily_expending: expending.toFixed(2),
-                    daily_health: dailyHealth.toFixed(2)
-                }
-            });
-        }
+        const assignedPoints: number =
+            +activity.durability -
+            +activity.basic_durability +
+            +activity.stamina -
+            +activity.basic_stamina +
+            +activity.comfort -
+            +activity.basic_comfort +
+            +activity.power -
+            +activity.basic_power;
+        const pointsToSpend: number = +activity.sneaker_level * 4 - assignedPoints;
+        setAvailablePointsToSpend(pointsToSpend);
+        const avgProfit =
+            +calculator.avg_profit_per_power_type_modifier[value.type?.toLowerCase() || activity.type.toLowerCase()];
+        const newActivity = { ...activity, ...value };
+        const repairCost: number =
+            calculator.repair_list.find((item: any) => item.sneaker_level === +activity.sneaker_level)?.repair_cost ||
+            0;
+        const durability: number = +activity.durability || 0;
+        const power: number = +activity.power || 0;
+        const earnings: number = avgProfit * power * +activity.energy_available;
+        const dailyHealth: number = +activity.energy_available / (1 + durability / 10);
+        const expending: number = repairCost * dailyHealth;
+        const profit: number = earnings > expending ? earnings - expending : 0;
+        setActivity({
+            ...newActivity,
+            ...{
+                daily_profit: profit.toFixed(2),
+                daily_earnings: earnings.toFixed(2),
+                daily_expending: expending.toFixed(2),
+                daily_health: dailyHealth.toFixed(2)
+            }
+        });
     };
     const optimizePoints = async () => {
         if (unlocked) {
@@ -169,10 +165,12 @@ function Home({ calculator }: HomeProps): ReactElement {
             <HowToUse />
             <div className="access-block">
                 <div className="token-balance">
-                    <span>App balance: </span>
-                    <span>{attempts}</span>
-                    <FitmintGuideTokenSvg />
-                    <span className="mr-2">FGT</span>
+                    <div>
+                        <span>App balance: </span>
+                        <span>{attempts}</span>
+                        <FitmintGuideTokenSvg />
+                        <span className="mr-2">FGT</span>
+                    </div>
                     <Button variant="secondary" size="sm" onClick={() => setModalShow(true)}>
                         Top Up
                     </Button>
@@ -184,22 +182,11 @@ function Home({ calculator }: HomeProps): ReactElement {
                     >
                         Post run results
                     </Button>
+                    <AddTokenButton />
                 </div>
-                {unlocked ? (
-                    ''
-                ) : (
-                    <Button
-                        className="primary d-flex align-items-center p-2 mt-3"
-                        size="sm"
-                        onClick={() => unlockCalculator()}
-                    >
-                        <UnlockSvg width={20} height={20} />
-                        <span className="ml-1">Unlock with 1 FGT</span>
-                    </Button>
-                )}
             </div>
             {/* <CalculatorHeader /> */}
-            <div className="row-main" style={!unlocked ? { pointerEvents: 'none', opacity: '0.1' } : {}}>
+            <div className="row-main">
                 <div className="col-main">
                     <h3>Sneaker</h3>
                     <div className="attribute-row">
@@ -251,7 +238,7 @@ function Home({ calculator }: HomeProps): ReactElement {
                     </div>
                 </div>
             </div>
-            <div className="row-main" style={!unlocked ? { pointerEvents: 'none', opacity: '0.1' } : {}}>
+            <div className="row-main">
                 <div className="col-main">
                     <h3>Attributes</h3>
                     <div className="attribute-row">
@@ -343,9 +330,15 @@ function Home({ calculator }: HomeProps): ReactElement {
                             </Button>
                         </div>
                         <div className="attribute-col-3">
-                            <Button className="primary optimize-btn" onClick={optimizePoints}>
-                                Optimize
-                            </Button>
+                            {!unlocked ? (
+                                <Button className="primary optimize-btn" onClick={() => unlockCalculator()}>
+                                    Unlock (1 FGT)
+                                </Button>
+                            ) : (
+                                <Button className="primary optimize-btn" onClick={optimizePoints}>
+                                    Optimize
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

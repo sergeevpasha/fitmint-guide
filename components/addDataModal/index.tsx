@@ -208,7 +208,6 @@ export default function AddDataModal(props: any): JSX.Element {
                     </Row>
                 </Container>
                 <div className={styles.actionsModal}>
-                    {balance <= 0 ? <AddTokenButton /> : ''}
                     {awaitingTransaction ? (
                         <Button className="primary ml-1" disabled>
                             <Spinner

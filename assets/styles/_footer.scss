@@ -1,4 +1,19 @@
 footer {
   background-color: #201F23;
   padding: 2em;
+  color: #fff;
+
+  ul {
+    list-style-type: none;
+    li {
+      font-size: 0.8rem;
+      line-height: 2em;
+    }
+  }
+
+  a {
+    font-size: 0.8rem;
+    color: #fff;
+    text-decoration: none;
+  }
 }

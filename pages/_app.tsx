@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import { appWithTranslation, useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
+import { Analytics } from '@vercel/analytics/react';
 import { useRouter } from 'next/router';
 import Layout from '../layouts/Main';
 import '../assets/styles/index.scss';
@@ -48,6 +49,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                     <meta property="profile:gender" content={t('male')} />
                 </Head>
                 <Component {...pageProps} />
+                <Analytics />
             </>
         </Layout>
     );

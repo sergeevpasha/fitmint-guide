@@ -7,15 +7,8 @@ import { Provider } from 'react-redux';
 import { Col, Container, Row } from 'react-bootstrap';
 import { store } from '../store';
 import Header from '../components/header';
-import axios from '../axios.config';
 
 function Layout({ children }: { children: ReactElement }) {
-    const [gitVersion, setGitVersion] = useState('');
-    useEffect(() => {
-        axios.get(`git`).then(({ data: { tag } }: { data: { tag: string } }) => {
-            setGitVersion(tag);
-        });
-    });
     return (
         <>
             <Head>
@@ -84,9 +77,6 @@ function Layout({ children }: { children: ReactElement }) {
                     >
                         <div className="name">
                             <span>Build</span>
-                        </div>
-                        <div className="status blue">
-                            <span>{gitVersion}</span>
                         </div>
                     </a>
                 </div>

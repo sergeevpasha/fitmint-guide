@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+    app:
+        command: sh -c "tail -f /dev/null"
+        ports:
+            - "${DOCKER_NODEJS_PORT}:3000"
+        volumes:
+            - ./:/var/www

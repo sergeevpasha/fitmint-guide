@@ -25,7 +25,6 @@ async function dbConnect() {
 
     if (!cached.promise) {
         const opts = {
-            strictQuery: false,
             useNewUrlParser: true,
             useUnifiedTopology: true,
             bufferCommands: false,

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./node_modules/.bin/ts-node server.ts",
+    "dev": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production ./node_modules/.bin/ts-node server.ts",
+    "start": "next start",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "fix": "npm run lint -- --fix"
   },

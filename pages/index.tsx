@@ -20,18 +20,22 @@ import CalculatorService from '../app/services/CalculatorService';
 import dbConnect from '../mongoose';
 
 export async function getServerSideProps() {
-    await dbConnect();
-    const avpProfitPerPowerTypeModifiers: any = await CalculatorService.avgProfitPerPowerTypeModifiers();
-    const repairToSneakerLevelList: object[] | null = await CalculatorService.repairToSneakerLevelList();
-    return {
-        props: {
-            calculator: {
-                avg_profit_per_power_type_modifier: avpProfitPerPowerTypeModifiers,
-                repair_list: JSON.parse(JSON.stringify(repairToSneakerLevelList))
-            },
-            ...(await serverSideTranslations('en'))
-        }
-    };
+    try {
+        await dbConnect();
+        const avpProfitPerPowerTypeModifiers: any = await CalculatorService.avgProfitPerPowerTypeModifiers();
+        const repairToSneakerLevelList: object[] | null = await CalculatorService.repairToSneakerLevelList();
+        return {
+            props: {
+                calculator: {
+                    avg_profit_per_power_type_modifier: avpProfitPerPowerTypeModifiers,
+                    repair_list: JSON.parse(JSON.stringify(repairToSneakerLevelList))
+                },
+                ...(await serverSideTranslations('en'))
+            }
+        };
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 interface HomeProps extends ScriptProps {

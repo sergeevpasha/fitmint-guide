@@ -35,6 +35,19 @@ export async function getServerSideProps() {
         };
     } catch (error) {
         console.error(error);
+        return {
+            props: {
+                calculator: {
+                    avg_profit_per_power_type_modifier: {
+                        walk: 1,
+                        jog: 1,
+                        run: 1
+                    },
+                    repair_list: []
+                },
+                ...(await serverSideTranslations('en'))
+            }
+        };
     }
 }
 

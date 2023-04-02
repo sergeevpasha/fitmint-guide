@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import UserService from '../../../app/services/UserService';
 import { UserModel } from '../../../app/models/User';
-import dbConnect from "../../../mongoose";
+import dbConnect from '../../../mongoose';
 
 async function showUser(address: string, response: NextApiResponse): Promise<void> {
     const user: UserModel | null = await UserService.findByAddress(address);

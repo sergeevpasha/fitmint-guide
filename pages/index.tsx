@@ -16,12 +16,19 @@ import { UserModel } from '../app/models/User';
 import AddDataModal from '../components/addDataModal';
 import { ActivityType } from '../app/models/Activity';
 import AddTokenButton from '../components/addTokenButton';
+import CalculatorService from '../app/services/CalculatorService';
+import dbConnect from '../mongoose';
 
 export async function getServerSideProps() {
-    const { data } = await axios.get('calculator');
+    await dbConnect();
+    const avpProfitPerPowerTypeModifiers: any = await CalculatorService.avgProfitPerPowerTypeModifiers();
+    const repairToSneakerLevelList: object[] | null = await CalculatorService.repairToSneakerLevelList();
     return {
         props: {
-            calculator: data.data,
+            calculator: {
+                avg_profit_per_power_type_modifier: avpProfitPerPowerTypeModifiers,
+                repair_list: JSON.parse(JSON.stringify(repairToSneakerLevelList))
+            },
             ...(await serverSideTranslations('en'))
         }
     };

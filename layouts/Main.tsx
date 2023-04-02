@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
 import Script from 'next/script';
@@ -7,15 +7,8 @@ import { Provider } from 'react-redux';
 import { Col, Container, Row } from 'react-bootstrap';
 import { store } from '../store';
 import Header from '../components/header';
-import axios from '../axios.config';
 
 function Layout({ children }: { children: ReactElement }) {
-    const [gitVersion, setGitVersion] = useState('');
-    useEffect(() => {
-        axios.get(`git`).then(({ data: { tag } }: { data: { tag: string } }) => {
-            setGitVersion(tag);
-        });
-    });
     return (
         <>
             <Head>
@@ -83,10 +76,7 @@ function Layout({ children }: { children: ReactElement }) {
                         rel="noreferrer"
                     >
                         <div className="name">
-                            <span>Build</span>
-                        </div>
-                        <div className="status blue">
-                            <span>{gitVersion}</span>
+                            <span>GitHub</span>
                         </div>
                     </a>
                 </div>
